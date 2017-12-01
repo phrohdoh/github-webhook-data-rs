@@ -22,9 +22,25 @@ impl Service for Listener {
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
             (&Method::Post, "/") => Box::new(req.body().concat2().map(handle)),
+            (&Method::Get, "/help") => Box::new(req.body().concat2().map(help)),
             _ => Box::new(ok(Response::new().with_status(StatusCode::NotFound))),
         }
     }
+}
+
+fn help(_chunk: Chunk) -> Response {
+    Response::new().with_body(r#"{"endpoints":[
+  {
+    "path": "/",
+    "method": "POST",
+    "description": "POST GitHub webhook API data to this endpoint"
+  },
+  {
+    "path": "/help",
+    "method": "GET",
+    "description": "Get a list of available endpoints and their accepted methods as JSON"
+  }
+]}"#)
 }
 
 fn handle(chunk: Chunk) -> Response {

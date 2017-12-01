@@ -1,0 +1,12 @@
+[package]
+authors = ["Taryn Hill <taryn@phrohdoh.com>"]
+name = "github_webhooks"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0.21"
+serde_derive = "1.0.21"
+serde_json = "1.0.6"
+
+[workspace]
+members = ["server", "send-webhook"]

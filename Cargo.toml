@@ -2,6 +2,9 @@
 authors = ["Taryn Hill <taryn@phrohdoh.com>"]
 name = "github_webhooks"
 version = "0.1.0"
+description = "GitHub webhook payload data types"
+license = "MIT OR Apache2"
+repository = "https://github.com/Phrohdoh/github-webhooks-rs"
 
 [dependencies]
 serde = "1.0.21"

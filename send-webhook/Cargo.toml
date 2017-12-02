@@ -4,7 +4,7 @@ name = "send-webhook"
 version = "0.0.1"
 
 [dependencies]
-reqwest = "0.8.1"
+reqwest = "0.8"
 
 [dependencies.github_webhook_data]
 path = "../"

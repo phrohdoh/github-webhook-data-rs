@@ -6,6 +6,7 @@ description = "GitHub webhook payload data types"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Phrohdoh/github-webhook-data-rs"
 include = ["src/**/*.rs", "Cargo.toml"]
+documentation = "https://docs.rs/github_webhook_data/"
 
 [dependencies]
 serde = "1.0.21"

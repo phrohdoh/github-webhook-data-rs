@@ -5,6 +5,7 @@ version = "0.1.0"
 description = "GitHub webhook payload data types"
 license = "MIT OR Apache2"
 repository = "https://github.com/Phrohdoh/github-webhooks-rs"
+include = ["src/**/*.rs", "Cargo.toml"]
 
 [dependencies]
 serde = "1.0.21"

@@ -6,5 +6,5 @@ version = "0.1.0"
 [dependencies]
 reqwest = "0.8.1"
 
-[dependencies.github_webhooks]
+[dependencies.github_webhook_data]
 path = "../"

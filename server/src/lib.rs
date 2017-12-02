@@ -3,7 +3,7 @@ extern crate futures;
 extern crate serde;
 extern crate serde_json;
 
-extern crate github_webhooks as ghwh;
+extern crate github_webhook_data as ghwh;
 
 use futures::future::{ok, Future};
 use futures::Stream;

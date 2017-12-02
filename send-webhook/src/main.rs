@@ -1,4 +1,4 @@
-extern crate github_webhooks as lib;
+extern crate github_webhook_data as lib;
 use lib::events::pull_request::{Event, Action, PullRequest, Head};
 
 extern crate reqwest;

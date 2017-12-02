@@ -11,5 +11,5 @@ serde_json = "1.0.6"
 structopt = "0.1.6"
 structopt-derive = "0.1.6"
 
-[dependencies.github_webhooks]
+[dependencies.github_webhook_data]
 path = "../"

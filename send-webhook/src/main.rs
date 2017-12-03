@@ -4,16 +4,27 @@ use lib::events::pull_request::{Event, Action, PullRequest, Head};
 extern crate reqwest;
 use reqwest::Client;
 
-fn main() {
-    let mut args = std::env::args().skip(1);
+#[macro_use] extern crate failure;
 
-    let send_to_addr = if let Some(send_to_addr) = args.nth(0) {
-        send_to_addr
-    } else {
-        eprintln!("Please provide the address to send the webhook data to. See the following example.");
-        eprintln!("send-webhook http://127.0.0.1:3000/endpoint");
-        std::process::exit(1);
-    };
+#[derive(Debug, Fail)]
+enum GeneralError {
+    #[fail(display = r#"Please provide the address to send the webhook data to. 
+Example: send-webhook http://127.0.0.1:3000/endpoint"#)]
+    AddressNotProvided,
+
+    #[fail(display = "Failed to serialize test data into JSON. Perhaps an invalid string?")]
+    FailedToCreateJson,
+
+    #[fail(display = "The remote endpoint did not respond. Is your server running?")]
+    EndpointDidNotRespond,
+
+    #[fail(display = "The response's body was not valid UTF-8 data so could not be presented.")]
+    NonUtf8ResponseBody,
+}
+
+fn run() -> Result<(reqwest::StatusCode, String), GeneralError> {
+    let mut args = std::env::args().skip(1);
+    let send_to_addr = args.nth(0).ok_or(GeneralError::AddressNotProvided)?;
 
     let data = Event {
         // TODO: Get the `action` from args.
@@ -28,17 +39,25 @@ fn main() {
         },
     };
 
-    // TODO: Do not use unwrap/expect. Prefer proper error handling.
-    let json = data.to_json().expect("Failed to serialize test data into JSON");
+    let json = data.to_json().map_err(|_| GeneralError::FailedToCreateJson)?;
 
     let client = Client::new();
-    let mut resp = client.post(&send_to_addr)
-        .body(json)
-        .send()
-        .expect("The remote endpoint did not respond");
+    let mut resp = client.post(&send_to_addr).body(json).send().map_err(|_| GeneralError::EndpointDidNotRespond)?;
 
-    let body = resp.text().expect("Unable to read the response's body");
+    let body = resp.text().map_err(|_| GeneralError::NonUtf8ResponseBody)?;
 
-    println!("Status: {}", resp.status());
-    println!("Body: {}", body);
+    Ok((resp.status(), body))
+}
+
+fn main() {
+    match run() {
+        Ok((status_code, resp_body)) => {
+            println!("Status: {}", status_code);
+            println!("Body: {}", resp_body);
+        },
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(1);
+        },
+    }
 }

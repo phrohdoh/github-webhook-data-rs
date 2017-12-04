@@ -1,20 +1,33 @@
+use ::std::str::FromStr;
+use ::serde::de::{value, Deserialize, IntoDeserializer};
 use ::serde_json::ser::to_string as to_json;
 use ::serde_json::de::from_str as from_json;
 use ::serde_json::Result as SerdeResult;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Action {
-    #[serde(rename = "assigned")]               Assigned,
-    #[serde(rename = "unassigned")]             Unassigned,
-    #[serde(rename = "review_requested")]       ReviewRequested,
-    #[serde(rename = "review_request_removed")] ReviewRequestRemoved,
-    #[serde(rename = "labeled")]                Labeled,
-    #[serde(rename = "unlabeled")]              Unlabeled,
-    #[serde(rename = "opened")]                 Opened,
-    #[serde(rename = "edited")]                 Edited,
-    #[serde(rename = "closed")]                 Closed,
-    #[serde(rename = "reopened")]               Reopened,
-    #[serde(rename = "synchronize")]            Synchronized,
+    Assigned,
+    Unassigned,
+    ReviewRequested,
+    ReviewRequestRemoved,
+    Labeled,
+    Unlabeled,
+    Opened,
+    Edited,
+    Closed,
+    Reopened,
+
+    #[serde(rename = "synchronize")]
+    Synchronized,
+}
+
+impl FromStr for Action {
+    type Err = value::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::deserialize(s.into_deserializer())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -4,13 +4,22 @@ use lib::events::pull_request::{Event, Action, PullRequest, Head};
 extern crate reqwest;
 use reqwest::Client;
 
-#[macro_use] extern crate failure;
+#[macro_use]
+extern crate failure;
 
 #[derive(Debug, Fail)]
 enum GeneralError {
     #[fail(display = r#"Please provide the address to send the webhook data to. 
 Example: send-webhook http://127.0.0.1:3000/endpoint"#)]
     AddressNotProvided,
+
+    #[fail(display = "Please provide the action type to send.")]
+    ActionNotProvided,
+
+    #[fail(display = "The provided action `{}` is invalid.", action)]
+    UnknownAction {
+        action: String,
+    },
 
     #[fail(display = "Failed to serialize test data into JSON. Perhaps an invalid string?")]
     FailedToCreateJson,
@@ -26,15 +35,19 @@ fn run() -> Result<(reqwest::StatusCode, String), GeneralError> {
     let mut args = std::env::args().skip(1);
     let send_to_addr = args.nth(0).ok_or(GeneralError::AddressNotProvided)?;
 
+    let action = {
+        let action = args.nth(0).ok_or(GeneralError::ActionNotProvided)?;
+        action.parse::<Action>().map_err(|_| GeneralError::UnknownAction { action })?
+    };
+
     let data = Event {
-        // TODO: Get the `action` from args.
-        action: Action::Opened,
+        action: action,
         number: 1,
         pull_request: PullRequest {
             head: Head {
-                label: String::from("Phrohdoh:test-1"),
-                ref_name: String::from("test-1"),
-                sha: String::from("abc123def456"),
+                label: "Phrohdoh:test-1".into(),
+                ref_name: "test-1".into(),
+                sha: "abc123def456".into(),
             },
         },
     };
@@ -56,7 +69,7 @@ fn main() {
             println!("Body: {}", resp_body);
         },
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("Error: {}", e);
             std::process::exit(1);
         },
     }
